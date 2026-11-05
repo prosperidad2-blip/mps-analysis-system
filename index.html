@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elementary School MPS & Proficiency Analysis System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; font-size: 10pt; }
+            .print-break { page-break-before: always; }
+            .shadow-lg, .shadow-md, .shadow-sm { box-shadow: none !important; }
+            .border { border-color: #000 !important; }
+        }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col">
+
+    <!-- NAVIGATION BAR -->
+    <nav id="nav-bar" class="bg-indigo-900 text-white shadow-md no-print hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-school text-yellow-400 text-2xl"></i>
+                    <div>
+                        <span class="font-bold text-lg tracking-wide block leading-tight">DepEd MPS & Proficiency Analyzer</span>
+                        <span class="text-xs text-indigo-200">Sta. Irene Central Elementary School</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="nav-user-badge" class="bg-indigo-800 px-3 py-1 rounded-full text-xs font-medium border border-indigo-700"></span>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 rounded transition shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- AUTHENTICATION VIEW -->
+        <div id="auth-view" class="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200 mt-10">
+            <div class="bg-indigo-900 px-6 py-6 text-center text-white">
+                <i class="fa-solid fa-graduation-cap text-4xl text-yellow-400 mb-2"></i>
+                <h2 class="text-xl font-bold">MPS & Proficiency System</h2>
+                <p class="text-indigo-200 text-xs mt-1">Kindergarten to Grade 6 Assessment Portal</p>
+            </div>
+
+            <!-- TOGGLE BUTTONS -->
+            <div class="flex border-b border-slate-200 bg-slate-50">
+                <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-3 text-center text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600">Sign In</button>
+                <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-3 text-center text-sm font-semibold text-slate-500 hover:text-slate-700">Create Account</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="form-login" onsubmit="handleLogin(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Username / Email</label>
+                    <input type="text" id="login-username" required class="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Password</label>
+                    <input type="password" id="login-password" required class="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-md text-sm shadow transition">Sign In</button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form id="form-register" onsubmit="handleRegister(event)" class="p-6 space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Full Name</label>
+                    <input type="text" id="reg-name" required placeholder="e.g. Maria Santos" class="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Username</label>
+                    <input type="text" id="reg-username" required class="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Password</label>
+                    <input type="password" id="reg-password" required class="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Assigned Grade Level</label>
+                    <select id="reg-grade" required class="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="Kindergarten">Kindergarten</option>
+                        <option value="Grade 1">Grade 1</option>
+                        <option value="Grade 2">Grade 2</option>
+                        <option value="Grade 3">Grade 3</option>
+                        <option value="Grade 4">Grade 4</option>
+                        <option value="Grade 5">Grade 5</option>
+                        <option value="Grade 6">Grade 6</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-md text-sm shadow transition">Create Account</button>
+            </form>
+        </div>
+
+        <!-- ADMIN DASHBOARD VIEW -->
+        <div id="admin-view" class="space-y-6 hidden">
+            <!-- ADMIN HEADER CONTROLS -->
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center justify-between no-print">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">System Admin Dashboard</h1>
+                    <p class="text-xs text-slate-500">Consolidated Mean Percentage Score (MPS) & Proficiency Analytics</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-400">School Year</label>
+                        <select id="admin-sy-select" onchange="renderAdminDashboard()" class="border text-xs rounded px-2 py-1.5 bg-slate-50 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="2024-2025">2024-2025</option>
+                            <option value="2025-2026">2025-2026</option>
+                            <option value="2026-2027" selected>2026-2027</option>
+                            <option value="2027-2028">2027-2028</option>
+                            <option value="2028-2029">2028-2029</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-400">Evaluation Term</label>
+                        <select id="admin-term-select" onchange="renderAdminDashboard()" class="border text-xs rounded px-2 py-1.5 bg-slate-50 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="Term 1">Term 1</option>
+                            <option value="Term 2">Term 2</option>
+                            <option value="Term 3">Term 3</option>
+                            <option value="Diagnostic Test Result">Diagnostic Test Result</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-400">Grade Level</label>
+                        <select id="admin-grade-select" onchange="renderAdminDashboard()" class="border text-xs rounded px-2 py-1.5 bg-slate-50 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="ALL">All Grade Levels</option>
+                            <option value="Kindergarten">Kindergarten</option>
+                            <option value="Grade 1">Grade 1</option>
+                            <option value="Grade 2">Grade 2</option>
+                            <option value="Grade 3">Grade 3</option>
+                            <option value="Grade 4">Grade 4</option>
+                            <option value="Grade 5">Grade 5</option>
+                            <option value="Grade 6">Grade 6</option>
+                        </select>
+                    </div>
+                    <button onclick="window.print()" class="mt-4 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded shadow flex items-center gap-2">
+                        <i class="fa-solid fa-print"></i> Print Summary Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABLE 1: CONSOLIDATED MPS BY GRADE LEVEL -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-5 py-4 bg-slate-50 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Consolidated MPS by Grade Level</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-indigo-900 text-white font-semibold">
+                            <tr>
+                                <th class="p-3 border border-indigo-800">Grade Level</th>
+                                <th class="p-3 border border-indigo-800">Science</th>
+                                <th class="p-3 border border-indigo-800">English</th>
+                                <th class="p-3 border border-indigo-800">Math</th>
+                                <th class="p-3 border border-indigo-800">Filipino</th>
+                                <th class="p-3 border border-indigo-800">AP</th>
+                                <th class="p-3 border border-indigo-800">ESP / GMRC</th>
+                                <th class="p-3 border border-indigo-800">EPP / TLE</th>
+                                <th class="p-3 border border-indigo-800">MAPEH</th>
+                                <th class="p-3 border border-indigo-800 bg-indigo-950 text-yellow-300">Overall Grade MPS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-mps-tbody" class="divide-y divide-slate-200">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABLE 2: SUBJECT SUMMARY RESULT & PROFICIENCY BY SEX -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-5 py-4 bg-slate-50 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Subject Summary Result & Proficiency Level by Sex</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center text-xs border-collapse">
+                        <thead class="bg-slate-800 text-white font-semibold">
+                            <tr>
+                                <th rowspan="2" class="p-3 border border-slate-700 text-left">Subject</th>
+                                <th colspan="5" class="p-2 border border-slate-700 bg-blue-900">Male Learner Proficiency Breakdown</th>
+                                <th colspan="5" class="p-2 border border-slate-700 bg-pink-900">Female Learner Proficiency Breakdown</th>
+                                <th rowspan="2" class="p-3 border border-slate-700 bg-slate-900">Total Learners</th>
+                            </tr>
+                            <tr class="text-[10px]">
+                                <th class="p-2 border border-slate-700 bg-emerald-800">HP (90-100)</th>
+                                <th class="p-2 border border-slate-700 bg-blue-800">P (75-89)</th>
+                                <th class="p-2 border border-slate-700 bg-yellow-700">NP (50-74)</th>
+                                <th class="p-2 border border-slate-700 bg-orange-700">LP (25-49)</th>
+                                <th class="p-2 border border-slate-700 bg-red-800">NotP (0-24)</th>
+                                <th class="p-2 border border-slate-700 bg-emerald-800">HP (90-100)</th>
+                                <th class="p-2 border border-slate-700 bg-blue-800">P (75-89)</th>
+                                <th class="p-2 border border-slate-700 bg-yellow-700">NP (50-74)</th>
+                                <th class="p-2 border border-slate-700 bg-orange-700">LP (25-49)</th>
+                                <th class="p-2 border border-slate-700 bg-red-800">NotP (0-24)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-subject-proficiency-tbody" class="divide-y divide-slate-200">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABLE 3: CONSOLIDATED PROFICIENCY LEVEL SUMMARY BY SEX -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-5 py-4 bg-slate-50 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Consolidated Learner Proficiency Summary by Sex</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center text-xs border-collapse">
+                        <thead class="bg-slate-800 text-white font-semibold">
+                            <tr>
+                                <th class="p-3 border border-slate-700 text-left">Proficiency Benchmark Level</th>
+                                <th class="p-3 border border-slate-700">Score Scale Range</th>
+                                <th class="p-3 border border-slate-700 bg-blue-900">Male Count</th>
+                                <th class="p-3 border border-slate-700 bg-pink-900">Female Count</th>
+                                <th class="p-3 border border-slate-700 bg-slate-900">Total Count</th>
+                                <th class="p-3 border border-slate-700">Overall Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-proficiency-tbody" class="divide-y divide-slate-200">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SYSTEM USER MANAGEMENT (CRUD) -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden no-print">
+                <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">User Account Management (CRUD)</h3>
+                    <span class="text-xs text-slate-500">System Admin Controlled</span>
+                </div>
+                <div class="p-5">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-semibold">
+                            <tr>
+                                <th class="p-2 border">Full Name</th>
+                                <th class="p-2 border">Username</th>
+                                <th class="p-2 border">Role</th>
+                                <th class="p-2 border">Assigned Grade</th>
+                                <th class="p-2 border text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-tbody">
+                            <!-- User rows dynamically rendered -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- USER / TEACHER DASHBOARD VIEW -->
+        <div id="user-view" class="space-y-6 hidden">
+            <!-- USER HEADER CONTROLS -->
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center justify-between no-print">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <span>Teacher Grade Dashboard</span>
+                        <span id="user-assigned-grade-pill" class="bg-indigo-100 text-indigo-800 text-xs px-2.5 py-1 rounded-full font-bold"></span>
+                    </h1>
+                    <p class="text-xs text-slate-500">Section Score Input, MPS Calculations & Student Proficiency Analysis</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-400">School Year</label>
+                        <select id="user-sy-select" onchange="renderUserDashboard()" class="border text-xs rounded px-2 py-1.5 bg-slate-50 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="2024-2025">2024-2025</option>
+                            <option value="2025-2026">2025-2026</option>
+                            <option value="2026-2027" selected>2026-2027</option>
+                            <option value="2027-2028">2027-2028</option>
+                            <option value="2028-2029">2028-2029</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-400">Evaluation Term</label>
+                        <select id="user-term-select" onchange="renderUserDashboard()" class="border text-xs rounded px-2 py-1.5 bg-slate-50 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="Term 1">Term 1</option>
+                            <option value="Term 2">Term 2</option>
+                            <option value="Term 3">Term 3</option>
+                            <option value="Diagnostic Test Result">Diagnostic Test Result</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-400">Active Section</label>
+                        <select id="user-section-select" onchange="renderUserDashboard()" class="border text-xs rounded px-2 py-1.5 bg-slate-50 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-400">Active Subject</label>
+                        <select id="user-subject-select" onchange="renderUserDashboard()" class="border text-xs rounded px-2 py-1.5 bg-slate-50 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                    <button onclick="window.print()" class="mt-4 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded shadow flex items-center gap-2">
+                        <i class="fa-solid fa-print"></i> Print Grade Summary
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION & SUBJECT MANAGEMENT CRUD -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
+                <!-- SECTIONS CRUD -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-slate-700 text-xs uppercase">Class Sections</h4>
+                        <button onclick="promptAddSection()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] px-2.5 py-1 rounded font-semibold">+ Add Section</button>
+                    </div>
+                    <div id="section-pills" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- SUBJECTS CRUD -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-slate-700 text-xs uppercase">Subjects / Learning Areas</h4>
+                        <button onclick="promptAddSubject()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] px-2.5 py-1 rounded font-semibold">+ Add Subject</button>
+                    </div>
+                    <div id="subject-pills" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <!-- TOTAL ITEMS AND ADD STUDENT -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-4 no-print">
+                <div class="flex items-center gap-3">
+                    <label class="text-xs font-bold uppercase text-slate-600">Total # of Test Items:</label>
+                    <input type="number" id="input-total-items" value="40" min="1" max="100" onchange="updateTotalItems(this.value)" class="w-20 px-2 py-1 border rounded text-sm font-semibold text-center focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="addStudentRow('M')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded shadow">+ Add Male Student</button>
+                    <button onclick="addStudentRow('F')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold px-3 py-1.5 rounded shadow">+ Add Female Student</button>
+                </div>
+            </div>
+
+            <!-- STUDENT SCORE INPUT MATRIX TABLE -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                    <h3 id="score-matrix-title" class="font-bold text-slate-800 text-sm uppercase tracking-wider">Student Score Sheet Matrix</h3>
+                    <span class="text-xs font-semibold text-slate-500" id="matrix-info-badge"></span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-800 text-white font-semibold">
+                            <tr>
+                                <th class="p-2 border border-slate-700 w-12 text-center">No.</th>
+                                <th class="p-2 border border-slate-700">Learner's Full Name</th>
+                                <th class="p-2 border border-slate-700 w-24 text-center">Sex</th>
+                                <th class="p-2 border border-slate-700 w-32 text-center">Raw Score</th>
+                                <th class="p-2 border border-slate-700 w-32 text-center">Percentage (%)</th>
+                                <th class="p-2 border border-slate-700 w-44 text-center">Proficiency Category</th>
+                                <th class="p-2 border border-slate-700 w-24 text-center no-print">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-scores-tbody" class="divide-y divide-slate-200">
+                            <!-- Student rows dynamically generated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- USER SUMMARY RESULTS (MPS & PROFICIENCY BY SUBJECT) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- SUBJECT MPS SUMMARY TABLE -->
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-5 py-4 bg-slate-50 border-b border-slate-200">
+                        <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Subject MPS Summary Result</h3>
+                    </div>
+                    <div class="p-4">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-indigo-900 text-white font-semibold">
+                                <tr>
+                                    <th class="p-2.5 border">Subject</th>
+                                    <th class="p-2.5 border text-center">Total Students</th>
+                                    <th class="p-2.5 border text-center">Average Score</th>
+                                    <th class="p-2.5 border text-center">MPS (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-mps-summary-tbody" class="divide-y divide-slate-200">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PROFICIENCY SUMMARY BY MALE & FEMALE TABLE -->
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-5 py-4 bg-slate-50 border-b border-slate-200">
+                        <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Proficiency Summary (Male & Female)</h3>
+                    </div>
+                    <div class="p-4">
+                        <table class="w-full text-center text-xs border-collapse">
+                            <thead class="bg-slate-800 text-white font-semibold">
+                                <tr>
+                                    <th class="p-2 border text-left">Level Range</th>
+                                    <th class="p-2 border">Male</th>
+                                    <th class="p-2 border">Female</th>
+                                    <th class="p-2 border">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-proficiency-summary-tbody" class="divide-y divide-slate-200">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- PRINT HEADER TEMPLATE (VISIBLE ONLY DURING PRINT) -->
+    <div id="print-header" class="print-only p-6 text-center space-y-1 border-b-2 border-black mb-4">
+        <p class="text-xs uppercase tracking-widest font-serif">Department of Education • Caraga Administrative Region • Division of Agusan del Sur</p>
+        <h1 class="text-xl font-bold uppercase tracking-wider font-serif">STA. IRENE CENTRAL ELEMENTARY SCHOOL</h1>
+        <h2 id="print-report-title" class="text-base font-bold uppercase underline mt-2">CONSOLIDATED MPS AND PROFICIENCY REPORT</h2>
+        <p id="print-report-sub" class="text-xs font-semibold text-slate-700"></p>
+    </div>
+
+    <!-- SCRIPT ENGINE -->
+    <script>
+        // CORE GLOBAL STATE
+        const APP_KEY = 'DEPED_MPS_PROFICIENCY_DATA_V1';
+        let db = {
+            users: [],
+            sections: {},
+            subjects: {},
+            scores: {}
+        };
+        let currentUser = null;
+
+        // INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            initStorage();
+            checkSession();
+        });
+
+        function initStorage() {
+            const data = localStorage.getItem(APP_KEY);
+            if (data) {
+                db = JSON.parse(data);
+            } else {
+                // Default Pre-populated Data
+                db = {
+                    users: [
+                        { id: 'u1', name: 'System Administrator', username: 'admin', role: 'admin', grade: 'ALL', pass: 'admin123' },
+                        { id: 'u2', name: 'Juan Dela Cruz', username: 'teacher1', role: 'user', grade: 'Grade 6', pass: 'user123' },
+                        { id: 'u3', name: 'Elena Gomez', username: 'teacher2', role: 'user', grade: 'Grade 5', pass: 'user123' }
+                    ],
+                    sections: {
+                        'Kindergarten': ['Mabait'],
+                        'Grade 1': ['Magsaysay'],
+                        'Grade 2': ['Quezon'],
+                        'Grade 3': ['Del Pilar'],
+                        'Grade 4': ['Aguinaldo'],
+                        'Grade 5': ['Bonifacio'],
+                        'Grade 6': ['Rizal', 'Mabini']
+                    },
+                    subjects: {
+                        'Kindergarten': ['Science', 'English', 'Math', 'Filipino'],
+                        'Grade 1': ['Science', 'English', 'Math', 'Filipino', 'AP', 'GMRC', 'MAPEH'],
+                        'Grade 2': ['Science', 'English', 'Math', 'Filipino', 'AP', 'GMRC', 'MAPEH'],
+                        'Grade 3': ['Science', 'English', 'Math', 'Filipino', 'AP', 'ESP', 'MAPEH'],
+                        'Grade 4': ['Science', 'English', 'Math', 'Filipino', 'AP', 'ESP', 'EPP', 'MAPEH'],
+                        'Grade 5': ['Science', 'English', 'Math', 'Filipino', 'AP', 'ESP', 'EPP', 'MAPEH'],
+                        'Grade 6': ['Science', 'English', 'Math', 'Filipino', 'AP', 'ESP', 'EPP', 'MAPEH', 'Journalism']
+                    },
+                    scores: {} // Key format: SY_GRADE_SECTION_SUBJECT_TERM
+                };
+                saveStorage();
+            }
+        }
+
+        function saveStorage() {
+            localStorage.setItem(APP_KEY, JSON.stringify(db));
+        }
+
+        function checkSession() {
+            const session = sessionStorage.getItem('CURRENT_USER');
+            if (session) {
+                currentUser = JSON.parse(session);
+                showNavigation();
+                if (currentUser.role === 'admin') {
+                    showView('admin-view');
+                    renderAdminDashboard();
+                } else {
+                    showView('user-view');
+                    initUserDropdowns();
+                    renderUserDashboard();
+                }
+            } else {
+                hideNavigation();
+                showView('auth-view');
+            }
+        }
+
+        // AUTHENTICATION CONTROLLERS
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('form-login');
+            const regForm = document.getElementById('form-register');
+            const tabLogin = document.getElementById('tab-login');
+            const tabReg = document.getElementById('tab-register');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                tabLogin.className = 'flex-1 py-3 text-center text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600';
+                tabReg.className = 'flex-1 py-3 text-center text-sm font-semibold text-slate-500 hover:text-slate-700';
+            } else {
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                tabReg.className = 'flex-1 py-3 text-center text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600';
+                tabLogin.className = 'flex-1 py-3 text-center text-sm font-semibold text-slate-500 hover:text-slate-700';
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value.trim();
+            const p = document.getElementById('login-password').value.trim();
+
+            const user = db.users.find(user => (user.username === u || user.name === u) && user.pass === p);
+            if (user) {
+                currentUser = user;
+                sessionStorage.setItem('CURRENT_USER', JSON.stringify(user));
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                checkSession();
+            } else {
+                alert('Invalid Username or Password!');
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const username = document.getElementById('reg-username').value.trim();
+            const grade = document.getElementById('reg-grade').value;
+            const pass = document.getElementById('reg-password').value.trim();
+
+            if (db.users.some(u => u.username === username)) {
+                alert('Username already taken! Please choose another.');
+                return;
+            }
+
+            const newUser = {
+                id: 'u_' + Date.now(),
+                name,
+                username,
+                role: 'user',
+                grade,
+                pass
+            };
+
+            db.users.push(newUser);
+            saveStorage();
+            alert('Account created successfully! Please Sign In.');
+            switchAuthTab('login');
+        }
+
+        function logout() {
+            sessionStorage.removeItem('CURRENT_USER');
+            currentUser = null;
+            checkSession();
+        }
+
+        function showView(viewId) {
+            ['auth-view', 'admin-view', 'user-view'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function showNavigation() {
+            const nav = document.getElementById('nav-bar');
+            const badge = document.getElementById('nav-user-badge');
+            nav.classList.remove('hidden');
+            badge.innerText = `${currentUser.name} (${currentUser.role === 'admin' ? 'System Admin' : currentUser.grade})`;
+        }
+
+        function hideNavigation() {
+            document.getElementById('nav-bar').classList.add('hidden');
+        }
+
+        // BENCHMARK PROFICIENCY CALCULATOR (90-100, 75-89, 50-74, 25-49, 0-24)
+        function getProficiencyLevel(pct) {
+            if (pct >= 90) return { category: 'Highly Proficient', code: 'HP', color: 'bg-emerald-100 text-emerald-800' };
+            if (pct >= 75) return { category: 'Proficient', code: 'P', color: 'bg-blue-100 text-blue-800' };
+            if (pct >= 50) return { category: 'Nearly Proficient', code: 'NP', color: 'bg-yellow-100 text-yellow-800' };
+            if (pct >= 25) return { category: 'Low Proficient', code: 'LP', color: 'bg-orange-100 text-orange-800' };
+            return { category: 'Not Proficient', code: 'NotP', color: 'bg-red-100 text-red-800' };
+        }
+
+        // SYSTEM ADMIN DASHBOARD LOGIC
+        function renderAdminDashboard() {
+            const selectedSY = document.getElementById('admin-sy-select').value;
+            const selectedTerm = document.getElementById('admin-term-select').value;
+            const selectedGrade = document.getElementById('admin-grade-select').value;
+
+            renderAdminMpsTable(selectedSY, selectedTerm, selectedGrade);
+            renderAdminSubjectProficiencyTable(selectedSY, selectedTerm, selectedGrade);
+            renderAdminConsolidatedProficiencyTable(selectedSY, selectedTerm, selectedGrade);
+            renderAdminUserManagement();
+        }
+
+        function renderAdminMpsTable(sy, term, gradeFilter) {
+            const grades = ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'];
+            const subjectsList = ['Science', 'English', 'Math', 'Filipino', 'AP', 'ESP / GMRC', 'EPP / TLE', 'MAPEH'];
+            const tbody = document.getElementById('admin-mps-tbody');
+            tbody.innerHTML = '';
+
+            const filteredGrades = gradeFilter === 'ALL' ? grades : grades.filter(g => g === gradeFilter);
+
+            filteredGrades.forEach(grade => {
+                const tr = document.createElement('tr');
+                let rowHtml = `<td class="p-3 border font-bold text-slate-900 bg-slate-50">${grade}</td>`;
+                
+                let totalGradeMpsSum = 0;
+                let validSubjectCount = 0;
+
+                subjectsList.forEach(sub => {
+                    const mpsVal = calculateAverageMpsForGradeSubject(sy, grade, sub, term);
+                    if (mpsVal !== null) {
+                        totalGradeMpsSum += mpsVal;
+                        validSubjectCount++;
+                        rowHtml += `<td class="p-3 border text-center font-medium">${mpsVal.toFixed(2)}%</td>`;
+                    } else {
+                        rowHtml += `<td class="p-3 border text-center text-slate-400 italic">N/A</td>`;
+                    }
+                });
+
+                const overallMps = validSubjectCount > 0 ? (totalGradeMpsSum / validSubjectCount).toFixed(2) + '%' : '0.00%';
+                rowHtml += `<td class="p-3 border text-center font-bold bg-indigo-50 text-indigo-900">${overallMps}</td>`;
+
+                tr.innerHTML = rowHtml;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function calculateAverageMpsForGradeSubject(sy, grade, subject, term) {
+            let totalPctSum = 0;
+            let totalCount = 0;
+
+            Object.keys(db.scores).forEach(key => {
+                const parts = key.split('_');
+                if (parts[0] === sy && parts[1] === grade && parts[3].toLowerCase().includes(subject.toLowerCase().split(' ')[0]) && parts[4] === term) {
+                    const record = db.scores[key];
+                    if (record && record.students) {
+                        record.students.forEach(st => {
+                            if (st.score !== '' && !isNaN(st.score)) {
+                                const pct = (parseFloat(st.score) / (record.totalItems || 40)) * 100;
+                                totalPctSum += pct;
+                                totalCount++;
+                            }
+                        });
+                    }
+                }
+            });
+
+            return totalCount > 0 ? totalPctSum / totalCount : null;
+        }
+
+        function renderAdminSubjectProficiencyTable(sy, term, gradeFilter) {
+            const subjects = ['Science', 'English', 'Math', 'Filipino', 'AP', 'ESP / GMRC', 'EPP / TLE', 'MAPEH', 'Journalism'];
+            const tbody = document.getElementById('admin-subject-proficiency-tbody');
+            tbody.innerHTML = '';
+
+            subjects.forEach(sub => {
+                const counts = {
+                    M: { HP: 0, P: 0, NP: 0, LP: 0, NotP: 0 },
+                    F: { HP: 0, P: 0, NP: 0, LP: 0, NotP: 0 }
+                };
+
+                Object.keys(db.scores).forEach(key => {
+                    const parts = key.split('_');
+                    const matchGrade = (gradeFilter === 'ALL' || parts[1] === gradeFilter);
+                    if (parts[0] === sy && matchGrade && parts[3].toLowerCase().includes(sub.toLowerCase().split(' ')[0]) && parts[4] === term) {
+                        const rec = db.scores[key];
+                        if (rec && rec.students) {
+                            rec.students.forEach(st => {
+                                if (st.score !== '' && !isNaN(st.score)) {
+                                    const pct = (parseFloat(st.score) / (rec.totalItems || 40)) * 100;
+                                    const lvl = getProficiencyLevel(pct);
+                                    if (st.sex === 'M' || st.sex === 'F') {
+                                        counts[st.sex][lvl.code]++;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+
+                const totalM = counts.M.HP + counts.M.P + counts.M.NP + counts.M.LP + counts.M.NotP;
+                const totalF = counts.F.HP + counts.F.P + counts.F.NP + counts.F.LP + counts.F.NotP;
+                const totalAll = totalM + totalF;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5 border text-left font-bold text-slate-800">${sub}</td>
+                    <td class="p-2 border font-medium">${counts.M.HP}</td>
+                    <td class="p-2 border font-medium">${counts.M.P}</td>
+                    <td class="p-2 border font-medium">${counts.M.NP}</td>
+                    <td class="p-2 border font-medium">${counts.M.LP}</td>
+                    <td class="p-2 border font-medium">${counts.M.NotP}</td>
+                    <td class="p-2 border font-medium">${counts.F.HP}</td>
+                    <td class="p-2 border font-medium">${counts.F.P}</td>
+                    <td class="p-2 border font-medium">${counts.F.NP}</td>
+                    <td class="p-2 border font-medium">${counts.F.LP}</td>
+                    <td class="p-2 border font-medium">${counts.F.NotP}</td>
+                    <td class="p-2 border font-bold bg-slate-100">${totalAll}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderAdminConsolidatedProficiencyTable(sy, term, gradeFilter) {
+            const tbody = document.getElementById('admin-proficiency-tbody');
+            tbody.innerHTML = '';
+
+            const tiers = [
+                { category: 'Highly Proficient', range: '90 - 100', code: 'HP' },
+                { category: 'Proficient', range: '75 - 89', code: 'P' },
+                { category: 'Nearly Proficient', range: '50 - 74', code: 'NP' },
+                { category: 'Low Proficient', range: '25 - 49', code: 'LP' },
+                { category: 'Not Proficient', range: '0 - 24', code: 'NotP' }
+            ];
+
+            const totals = { M: { HP:0, P:0, NP:0, LP:0, NotP:0 }, F: { HP:0, P:0, NP:0, LP:0, NotP:0 } };
+            let grandTotalLearners = 0;
+
+            Object.keys(db.scores).forEach(key => {
+                const parts = key.split('_');
+                const matchGrade = (gradeFilter === 'ALL' || parts[1] === gradeFilter);
+                if (parts[0] === sy && matchGrade && parts[4] === term) {
+                    const rec = db.scores[key];
+                    if (rec && rec.students) {
+                        rec.students.forEach(st => {
+                            if (st.score !== '' && !isNaN(st.score)) {
+                                const pct = (parseFloat(st.score) / (rec.totalItems || 40)) * 100;
+                                const lvl = getProficiencyLevel(pct);
+                                if (st.sex === 'M' || st.sex === 'F') {
+                                    totals[st.sex][lvl.code]++;
+                                    grandTotalLearners++;
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+            tiers.forEach(t => {
+                const mCount = totals.M[t.code];
+                const fCount = totals.F[t.code];
+                const tCount = mCount + fCount;
+                const pct = grandTotalLearners > 0 ? ((tCount / grandTotalLearners) * 100).toFixed(2) + '%' : '0.00%';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5 border text-left font-bold text-slate-800">${t.category}</td>
+                    <td class="p-2.5 border font-semibold text-slate-600">${t.range}</td>
+                    <td class="p-2.5 border font-semibold text-blue-900 bg-blue-50/50">${mCount}</td>
+                    <td class="p-2.5 border font-semibold text-pink-900 bg-pink-50/50">${fCount}</td>
+                    <td class="p-2.5 border font-bold text-slate-900 bg-slate-100">${tCount}</td>
+                    <td class="p-2.5 border font-bold text-indigo-700">${pct}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderAdminUserManagement() {
+            const tbody = document.getElementById('admin-users-tbody');
+            tbody.innerHTML = '';
+
+            db.users.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 border font-medium">${u.name}</td>
+                    <td class="p-2 border text-slate-600">${u.username}</td>
+                    <td class="p-2 border"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${u.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}">${u.role}</span></td>
+                    <td class="p-2 border">${u.grade}</td>
+                    <td class="p-2 border text-center space-x-1">
+                        <button onclick="resetUserPassword('${u.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-[10px] font-semibold">Reset Pass</button>
+                        ${u.role !== 'admin' ? `<button onclick="deleteUser('${u.id}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px] font-semibold">Delete</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function resetUserPassword(userId) {
+            const user = db.users.find(u => u.id === userId);
+            if (user) {
+                const newPass = prompt(`Enter new password for ${user.name}:`, '123456');
+                if (newPass) {
+                    user.pass = newPass;
+                    saveStorage();
+                    alert('Password reset successfully!');
+                    renderAdminUserManagement();
+                }
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user account?')) {
+                db.users = db.users.filter(u => u.id !== userId);
+                saveStorage();
+                renderAdminUserManagement();
+            }
+        }
+
+        // USER / TEACHER DASHBOARD LOGIC
+        function initUserDropdowns() {
+            document.getElementById('user-assigned-grade-pill').innerText = currentUser.grade;
+            renderSectionDropdown();
+            renderSubjectDropdown();
+        }
+
+        function renderSectionDropdown() {
+            const secSelect = document.getElementById('user-section-select');
+            const gradeSecs = db.sections[currentUser.grade] || [];
+            secSelect.innerHTML = gradeSecs.map(s => `<option value="${s}">${s}</option>`).join('');
+            renderSectionPills();
+        }
+
+        function renderSubjectDropdown() {
+            const subSelect = document.getElementById('user-subject-select');
+            const gradeSubs = db.subjects[currentUser.grade] || [];
+            subSelect.innerHTML = gradeSubs.map(s => `<option value="${s}">${s}</option>`).join('');
+            renderSubjectPills();
+        }
+
+        function renderSectionPills() {
+            const container = document.getElementById('section-pills');
+            const gradeSecs = db.sections[currentUser.grade] || [];
+            container.innerHTML = gradeSecs.map(sec => `
+                <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 border px-2.5 py-1 rounded text-xs font-semibold">
+                    ${sec}
+                    <button onclick="deleteSection('${sec}')" class="text-red-500 hover:text-red-700">&times;</button>
+                </span>
+            `).join('');
+        }
+
+        function renderSubjectPills() {
+            const container = document.getElementById('subject-pills');
+            const gradeSubs = db.subjects[currentUser.grade] || [];
+            container.innerHTML = gradeSubs.map(sub => `
+                <span class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded text-xs font-semibold">
+                    ${sub}
+                    <button onclick="deleteSubject('${sub}')" class="text-red-500 hover:text-red-700">&times;</button>
+                </span>
+            `).join('');
+        }
+
+        function promptAddSection() {
+            const secName = prompt('Enter new Section Name:');
+            if (secName) {
+                if (!db.sections[currentUser.grade]) db.sections[currentUser.grade] = [];
+                db.sections[currentUser.grade].push(secName.trim());
+                saveStorage();
+                renderSectionDropdown();
+                renderUserDashboard();
+            }
+        }
+
+        function deleteSection(secName) {
+            if (confirm(`Delete section "${secName}"?`)) {
+                db.sections[currentUser.grade] = db.sections[currentUser.grade].filter(s => s !== secName);
+                saveStorage();
+                renderSectionDropdown();
+                renderUserDashboard();
+            }
+        }
+
+        function promptAddSubject() {
+            const subName = prompt('Enter new Subject Name:');
+            if (subName) {
+                if (!db.subjects[currentUser.grade]) db.subjects[currentUser.grade] = [];
+                db.subjects[currentUser.grade].push(subName.trim());
+                saveStorage();
+                renderSubjectDropdown();
+                renderUserDashboard();
+            }
+        }
+
+        function deleteSubject(subName) {
+            if (confirm(`Delete subject "${subName}"?`)) {
+                db.subjects[currentUser.grade] = db.subjects[currentUser.grade].filter(s => s !== subName);
+                saveStorage();
+                renderSubjectDropdown();
+                renderUserDashboard();
+            }
+        }
+
+        function getActiveScoreKey() {
+            const sy = document.getElementById('user-sy-select').value;
+            const term = document.getElementById('user-term-select').value;
+            const sec = document.getElementById('user-section-select').value || 'Default';
+            const sub = document.getElementById('user-subject-select').value || 'General';
+            return `${sy}_${currentUser.grade}_${sec}_${sub}_${term}`;
+        }
+
+        function renderUserDashboard() {
+            const key = getActiveScoreKey();
+            if (!db.scores[key]) {
+                db.scores[key] = { totalItems: 40, students: [] };
+            }
+
+            const activeData = db.scores[key];
+            document.getElementById('input-total-items').value = activeData.totalItems || 40;
+
+            const sy = document.getElementById('user-sy-select').value;
+            const term = document.getElementById('user-term-select').value;
+            const sec = document.getElementById('user-section-select').value;
+            const sub = document.getElementById('user-subject-select').value;
+
+            document.getElementById('matrix-info-badge').innerText = `${sy} | ${currentUser.grade} - ${sec} | ${sub} | ${term}`;
+
+            renderStudentScoreMatrix(activeData);
+            renderUserMpsSummary();
+            renderUserProficiencySummary();
+        }
+
+        function renderStudentScoreMatrix(activeData) {
+            const tbody = document.getElementById('student-scores-tbody');
+            tbody.innerHTML = '';
+
+            if (activeData.students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">No students added yet. Click "+ Add Student" above to start inputting scores.</td></tr>`;
+                return;
+            }
+
+            activeData.students.forEach((st, idx) => {
+                const totalItems = activeData.totalItems || 40;
+                const rawScore = st.score !== '' ? parseFloat(st.score) : 0;
+                const pct = (rawScore / totalItems) * 100;
+                const prof = getProficiencyLevel(pct);
+
+                const tr = document.createElement('tr');
+                tr.className = st.sex === 'M' ? 'bg-blue-50/20' : 'bg-pink-50/20';
+                tr.innerHTML = `
+                    <td class="p-2 border text-center font-bold text-slate-500">${idx + 1}</td>
+                    <td class="p-2 border">
+                        <input type="text" value="${st.name}" onchange="updateStudentName(${idx}, this.value)" class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 font-semibold text-slate-800 text-xs">
+                    </td>
+                    <td class="p-2 border text-center font-bold ${st.sex === 'M' ? 'text-blue-700' : 'text-pink-700'}">${st.sex === 'M' ? 'Male' : 'Female'}</td>
+                    <td class="p-2 border text-center">
+                        <input type="number" min="0" max="${totalItems}" value="${st.score}" onchange="updateStudentScore(${idx}, this.value)" class="w-20 px-2 py-1 border rounded text-center font-bold text-xs focus:ring-2 focus:ring-indigo-500">
+                    </td>
+                    <td class="p-2 border text-center font-bold text-slate-700">${pct.toFixed(2)}%</td>
+                    <td class="p-2 border text-center">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${prof.color}">${prof.category}</span>
+                    </td>
+                    <td class="p-2 border text-center no-print">
+                        <button onclick="deleteStudentRow(${idx})" class="text-red-600 hover:text-red-800 text-xs font-bold"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addStudentRow(sex) {
+            const key = getActiveScoreKey();
+            if (!db.scores[key]) db.scores[key] = { totalItems: 40, students: [] };
+
+            const defaultName = sex === 'M' ? `Male Student ${db.scores[key].students.length + 1}` : `Female Student ${db.scores[key].students.length + 1}`;
+            db.scores[key].students.push({ name: defaultName, sex, score: 0 });
+            saveStorage();
+            renderUserDashboard();
+        }
+
+        function updateStudentName(idx, val) {
+            const key = getActiveScoreKey();
+            db.scores[key].students[idx].name = val;
+            saveStorage();
+        }
+
+        function updateStudentScore(idx, val) {
+            const key = getActiveScoreKey();
+            db.scores[key].students[idx].score = val;
+            saveStorage();
+            renderUserDashboard();
+        }
+
+        function deleteStudentRow(idx) {
+            const key = getActiveScoreKey();
+            db.scores[key].students.splice(idx, 1);
+            saveStorage();
+            renderUserDashboard();
+        }
+
+        function updateTotalItems(val) {
+            const key = getActiveScoreKey();
+            if (!db.scores[key]) db.scores[key] = { totalItems: 40, students: [] };
+            db.scores[key].totalItems = parseFloat(val) || 40;
+            saveStorage();
+            renderUserDashboard();
+        }
+
+        function renderUserMpsSummary() {
+            const sy = document.getElementById('user-sy-select').value;
+            const term = document.getElementById('user-term-select').value;
+            const sec = document.getElementById('user-section-select').value;
+            const subjects = db.subjects[currentUser.grade] || [];
+            const tbody = document.getElementById('user-mps-summary-tbody');
+            tbody.innerHTML = '';
+
+            subjects.forEach(sub => {
+                const key = `${sy}_${currentUser.grade}_${sec}_${sub}_${term}`;
+                const rec = db.scores[key];
+
+                let totalScore = 0;
+                let count = 0;
+                let totalItems = 40;
+
+                if (rec && rec.students && rec.students.length > 0) {
+                    totalItems = rec.totalItems || 40;
+                    rec.students.forEach(st => {
+                        if (st.score !== '' && !isNaN(st.score)) {
+                            totalScore += parseFloat(st.score);
+                            count++;
+                        }
+                    });
+                }
+
+                const avgScore = count > 0 ? (totalScore / count).toFixed(2) : '0.00';
+                const mps = count > 0 ? ((parseFloat(avgScore) / totalItems) * 100).toFixed(2) + '%' : '0.00%';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 border font-bold text-slate-800">${sub}</td>
+                    <td class="p-2 border text-center font-medium">${count}</td>
+                    <td class="p-2 border text-center font-medium">${avgScore} / ${totalItems}</td>
+                    <td class="p-2 border text-center font-bold text-indigo-700 bg-indigo-50/50">${mps}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderUserProficiencySummary() {
+            const key = getActiveScoreKey();
+            const rec = db.scores[key];
+            const tbody = document.getElementById('user-proficiency-summary-tbody');
+            tbody.innerHTML = '';
+
+            const tiers = [
+                { category: 'Highly Proficient (90-100)', code: 'HP' },
+                { category: 'Proficient (75-89)', code: 'P' },
+                { category: 'Nearly Proficient (50-74)', code: 'NP' },
+                { category: 'Low Proficient (25-49)', code: 'LP' },
+                { category: 'Not Proficient (0-24)', code: 'NotP' }
+            ];
+
+            const counts = { M: { HP:0, P:0, NP:0, LP:0, NotP:0 }, F: { HP:0, P:0, NP:0, LP:0, NotP:0 } };
+
+            if (rec && rec.students) {
+                const totalItems = rec.totalItems || 40;
+                rec.students.forEach(st => {
+                    if (st.score !== '' && !isNaN(st.score)) {
+                        const pct = (parseFloat(st.score) / totalItems) * 100;
+                        const prof = getProficiencyLevel(pct);
+                        if (st.sex === 'M' || st.sex === 'F') {
+                            counts[st.sex][prof.code]++;
+                        }
+                    }
+                });
+            }
+
+            tiers.forEach(t => {
+                const m = counts.M[t.code];
+                const f = counts.F[t.code];
+                const tot = m + f;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 border text-left font-semibold text-slate-700">${t.category}</td>
+                    <td class="p-2 border font-bold text-blue-700">${m}</td>
+                    <td class="p-2 border font-bold text-pink-700">${f}</td>
+                    <td class="p-2 border font-bold text-slate-900 bg-slate-100">${tot}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // DYNAMIC PRINT HEADER SYNCHRONIZER
+        window.onbeforeprint = () => {
+            const subTitle = document.getElementById('print-report-sub');
+            if (currentUser.role === 'admin') {
+                const sy = document.getElementById('admin-sy-select').value;
+                const term = document.getElementById('admin-term-select').value;
+                const grade = document.getElementById('admin-grade-select').value;
+                subTitle.innerText = `School Year: ${sy} | Evaluation Period: ${term} | Grade Level Focus: ${grade}`;
+            } else {
+                const sy = document.getElementById('user-sy-select').value;
+                const term = document.getElementById('user-term-select').value;
+                const sec = document.getElementById('user-section-select').value;
+                const sub = document.getElementById('user-subject-select').value;
+                subTitle.innerText = `School Year: ${sy} | Assigned Grade: ${currentUser.grade} - Section ${sec} | Subject: ${sub} | Period: ${term}`;
+            }
+        };
+    </script>
+</body>
+</html>
